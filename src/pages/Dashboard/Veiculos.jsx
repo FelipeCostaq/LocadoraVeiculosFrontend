@@ -196,15 +196,26 @@ const Veiculos = () => {
                     </td>
                     <td className="px-6 py-4 text-sm">{veiculo.cor}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-[10px] font-bold ${
-                          veiculo.disponivel
-                            ? "bg-green-500/10 text-green-500"
-                            : "bg-destructive/10 text-destructive"
-                        }`}
-                      >
-                        {veiculo.disponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold w-fit ${
+                            veiculo.ativo
+                              ? "bg-blue-500/10 text-blue-500"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {veiculo.ativo ? "NA FROTA" : "DESATIVADO"}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold w-fit ${
+                            veiculo.disponivel
+                              ? "bg-green-500/10 text-green-500"
+                              : "bg-orange-500/10 text-orange-500"
+                          }`}
+                        >
+                          {veiculo.disponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
@@ -345,7 +356,20 @@ const Veiculos = () => {
                   }
                 />
               </div>
-              <div className="col-span-2 flex items-center gap-4 pt-4 border-t border-border mt-4">
+              <div className="col-span-2 flex items-center gap-6 pt-4 border-t border-border mt-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.ativo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, ativo: e.target.checked })
+                    }
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary bg-input"
+                  />
+                  <span className="text-sm font-medium">
+                    Veículo Ativo na Frota
+                  </span>
+                </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"

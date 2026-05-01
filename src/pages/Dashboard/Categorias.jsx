@@ -173,6 +173,21 @@ const Categorias = () => {
                   />
                 </div>
               </div>
+
+              {currentCategoria && (
+                <div className="flex items-center gap-4 pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={formData.ativo}
+                      onChange={(e) => setFormData({...formData, ativo: e.target.checked})}
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary bg-input"
+                    />
+                    <span className="text-sm font-medium">Categoria Ativa</span>
+                  </label>
+                </div>
+              )}
+
               <div className="flex justify-end gap-3 mt-6">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-bold hover:bg-muted rounded-lg">
                   Cancelar
