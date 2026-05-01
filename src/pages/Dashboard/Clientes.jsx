@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/client';
-import { Plus, Edit, Users, Loader2, X, Phone, Mail, MapPin, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Loader2, X, Phone, Mail, MapPin, Calendar } from 'lucide-react';
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -25,6 +25,17 @@ const Clientes = () => {
       console.error('Erro ao buscar clientes:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.")) return;
+    try {
+      await api.delete('/clientes', { params: { id } });
+      fetchClientes();
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error);
+      alert('Não foi possível excluir o cliente. Verifique se ele possui locações vinculadas.');
     }
   };
 
@@ -160,12 +171,22 @@ const Clientes = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => handleOpenModal(cliente)}
-                        className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary"
-                      >
-                        <Edit size={18} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => handleOpenModal(cliente)}
+                          className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary"
+                          title="Editar Cliente"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(cliente.id)}
+                          className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive"
+                          title="Excluir Cliente"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
