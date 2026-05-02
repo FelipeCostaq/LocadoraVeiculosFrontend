@@ -100,6 +100,9 @@ const Veiculos = () => {
     
     if (formData.imagem) {
       data.append("imagem", formData.imagem);
+    } else if (currentVeiculo?.imagemUrl) {
+      // Send the current URL if no new file was selected to avoid clearing it
+      data.append("imagemUrl", currentVeiculo.imagemUrl);
     }
 
     try {
