@@ -23,7 +23,7 @@ const Veiculos = () => {
     ano: new Date().getFullYear(),
     cor: "",
     categoriaId: "",
-    imagemUrl: "",
+    imagem: null,
     disponivel: true,
     ativo: true,
   });
@@ -66,6 +66,7 @@ const Veiculos = () => {
         ...veiculo,
         // Ensure numeric fields are numbers
         ano: parseInt(veiculo.ano),
+        imagem: null, // Reset file input when opening for edit
       });
     } else {
       setCurrentVeiculo(null);
@@ -76,7 +77,7 @@ const Veiculos = () => {
         ano: new Date().getFullYear(),
         cor: "",
         categoriaId: categorias[0]?.id || "",
-        imagemUrl: "",
+        imagem: null,
         disponivel: true,
         ativo: true,
       });
@@ -87,32 +88,34 @@ const Veiculos = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Payload matches RequestAdicionarVeiculoDTO and RequestEditarVeiculoDTO
-    const payload = {
-      placa: formData.placa, // Re-including because the backend validation requires it
-      marca: formData.marca,
-      modelo: formData.modelo,
-      ano: parseInt(formData.ano),
-      cor: formData.cor,
-      categoriaId: formData.categoriaId,
-      imagemUrl: formData.imagemUrl,
-      disponivel: formData.disponivel,
-      ativo: formData.ativo,
-    };
+    const data = new FormData();
+    data.append("placa", formData.placa);
+    data.append("marca", formData.marca);
+    data.append("modelo", formData.modelo);
+    data.append("ano", formData.ano);
+    data.append("cor", formData.cor);
+    data.append("categoriaId", formData.categoriaId);
+    data.append("disponivel", formData.disponivel);
+    data.append("ativo", formData.ativo);
+    
+    if (formData.imagem) {
+      data.append("imagem", formData.imagem);
+    }
 
     try {
       if (currentVeiculo) {
-        // Based on the user's Swagger info, the 'placa' is expected as a query parameter named 'id'
         const targetId = String(currentVeiculo.id || currentVeiculo.placa);
-        console.log(
-          "Atualizando veículo. URL Final:",
-          `/veiculos?placa=${targetId}`,
-        );
-
-        // Use a direct string URL to ensure the '?' is present as required by the backend
-        await api.put(`/veiculos?placa=${targetId}`, payload);
+        await api.put(`/veiculos?placa=${targetId}`, data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       } else {
-        await api.post("/veiculos", payload);
+        await api.post("/veiculos", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       }
       setIsModalOpen(false);
       fetchData();
@@ -353,16 +356,27 @@ const Veiculos = () => {
               </div>
               <div className="col-span-2 space-y-1">
                 <label className="text-xs font-bold text-muted-foreground uppercase">
-                  URL da Imagem
+                  Imagem do Veículo
                 </label>
-                <input
-                  type="text"
-                  className="w-full bg-input border border-border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.imagemUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, imagemUrl: e.target.value })
-                  }
-                />
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full bg-input border border-border rounded-lg p-2 text-sm file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                    onChange={(e) =>
+                      setFormData({ ...formData, imagem: e.target.files[0] })
+                    }
+                  />
+                  {currentVeiculo?.imagemUrl && !formData.imagem && (
+                    <div className="w-12 h-12 rounded-lg border border-border overflow-hidden shrink-0">
+                      <img 
+                        src={currentVeiculo.imagemUrl} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="col-span-2 flex items-center gap-6 pt-4 border-t border-border mt-4">
                 <label className="flex items-center gap-2 cursor-pointer">
