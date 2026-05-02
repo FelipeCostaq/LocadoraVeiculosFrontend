@@ -9,8 +9,10 @@ const Home = () => {
   useEffect(() => {
     const fetchVeiculos = async () => {
       try {
-        const response = await api.get('/veiculos/disponivel');
-        setVeiculos(response.data);
+        const response = await api.get('/veiculos');
+        // Filter only active vehicles
+        const activeVeiculos = response.data.filter(v => v.ativo);
+        setVeiculos(activeVeiculos);
       } catch (error) {
         console.error('Erro ao buscar veículos:', error);
       } finally {
@@ -47,8 +49,8 @@ const Home = () => {
                     <CarIcon size={48} />
                   </div>
                 )}
-                <div className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
-                  DISPONÍVEL
+                <div className={`absolute top-4 right-4 text-primary-foreground text-xs font-bold px-2 py-1 rounded ${veiculo.disponivel ? 'bg-primary' : 'bg-destructive'}`}>
+                  {veiculo.disponivel ? 'DISPONÍVEL' : 'INDISPONÍVEL'}
                 </div>
               </div>
               
@@ -71,7 +73,7 @@ const Home = () => {
         ) : (
           <div className="col-span-full text-center py-20">
             <CarIcon size={64} className="mx-auto text-muted-foreground mb-4 opacity-20" />
-            <p className="text-xl text-muted-foreground">Nenhum veículo disponível no momento.</p>
+            <p className="text-xl text-muted-foreground">Nenhum veículo encontrado no momento.</p>
           </div>
         )}
       </div>

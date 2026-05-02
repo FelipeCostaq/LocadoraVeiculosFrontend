@@ -5,7 +5,6 @@ import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import DashboardHome from './pages/Dashboard/DashboardHome';
 import Veiculos from './pages/Dashboard/Veiculos';
 import Categorias from './pages/Dashboard/Categorias';
@@ -47,7 +46,6 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
 
           {/* Protected Dashboard Routes */}
           <Route path="/dashboard" element={<ProtectedRoute />}>

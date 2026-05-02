@@ -47,6 +47,18 @@ const Veiculos = () => {
     fetchData();
   }, []);
 
+  const formatPlaca = (value) => {
+    return value
+      .replace(/[^A-Za-z0-9]/g, "") // Remove símbolos e espaços
+      .toUpperCase()
+      .slice(0, 7); // Placas brasileiras têm 7 caracteres
+  };
+
+  const handlePlacaChange = (e) => {
+    const formatted = formatPlaca(e.target.value);
+    setFormData({ ...formData, placa: formatted });
+  };
+
   const handleOpenModal = (veiculo = null) => {
     if (veiculo) {
       setCurrentVeiculo(veiculo);
@@ -106,11 +118,8 @@ const Veiculos = () => {
       fetchData();
     } catch (error) {
       console.error("Erro detalhado:", error.response?.data);
-      const errors = error.response?.data?.errors;
-      const errorMsg = errors
-        ? JSON.stringify(errors)
-        : "Erro desconhecido ao salvar";
-      alert("Erro ao salvar veículo: " + errorMsg);
+      const errorMsg = error.response?.data?.mensagem || "Erro ao salvar veículo.";
+      alert(errorMsg);
     }
   };
 
@@ -287,12 +296,11 @@ const Veiculos = () => {
                 <input
                   type="text"
                   required
+                  placeholder="AAA0A00"
                   disabled={!!currentVeiculo}
-                  className={`w-full bg-input border border-border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-primary ${currentVeiculo ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`w-full bg-input border border-border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-primary font-mono ${currentVeiculo ? "opacity-50 cursor-not-allowed" : ""}`}
                   value={formData.placa}
-                  onChange={(e) =>
-                    setFormData({ ...formData, placa: e.target.value })
-                  }
+                  onChange={handlePlacaChange}
                 />
               </div>
               <div className="space-y-1">

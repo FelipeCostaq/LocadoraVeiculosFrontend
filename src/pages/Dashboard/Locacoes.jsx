@@ -45,6 +45,8 @@ const Locacoes = () => {
       fetchData();
     } catch (error) {
       console.error('Erro ao dar baixa na locação:', error);
+      const errorMsg = error.response?.data?.mensagem || "Erro ao dar baixa na locação.";
+      alert(errorMsg);
     }
   };
 
@@ -55,9 +57,7 @@ const Locacoes = () => {
       fetchData();
     } catch (error) {
       console.error('Erro ao cancelar locação:', error);
-      const errorMsg = typeof error.response?.data === 'string' 
-        ? error.response.data 
-        : "Erro ao cancelar locação. Verifique se a data de retirada já passou.";
+      const errorMsg = error.response?.data?.mensagem || "Erro ao cancelar locação. Verifique se a data de retirada já passou.";
       alert(errorMsg);
     }
   };
@@ -70,6 +70,8 @@ const Locacoes = () => {
       fetchData();
     } catch (error) {
       console.error('Erro ao registrar locação:', error);
+      const errorMsg = error.response?.data?.mensagem || "Erro ao registrar locação.";
+      alert(errorMsg);
     }
   };
 

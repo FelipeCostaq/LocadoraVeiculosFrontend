@@ -90,13 +90,6 @@ const Login = () => {
             {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : 'Entrar'}
           </button>
         </form>
-
-        <p className="mt-8 text-center text-sm text-muted-foreground">
-          Não tem uma conta?{' '}
-          <Link to="/register" className="text-primary hover:underline font-medium">
-            Cadastre-se
-          </Link>
-        </p>
       </div>
     </div>
   );

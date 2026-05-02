@@ -65,7 +65,8 @@ const Categorias = () => {
       fetchCategorias();
     } catch (error) {
       console.error('Erro ao salvar categoria:', error);
-      alert('Erro ao salvar categoria. Verifique os dados.');
+      const errorMsg = error.response?.data?.mensagem || 'Erro ao salvar categoria. Verifique os dados.';
+      alert(errorMsg);
     }
   };
 
