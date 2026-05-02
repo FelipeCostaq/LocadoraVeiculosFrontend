@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import heroImg from "../assets/hero.png";
+import { formatCurrency } from "../utils/format";
 
 const Home = () => {
   const [veiculos, setVeiculos] = useState([]);
@@ -194,11 +195,8 @@ const Home = () => {
                           Diária
                         </span>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-sm font-bold text-primary">
-                            R$
-                          </span>
                           <span className="text-2xl font-black text-primary">
-                            {cat.valorDiaria.toFixed(2).replace(".", ",")}
+                            {formatCurrency(cat.valorDiaria)}
                           </span>
                         </div>
                       </div>

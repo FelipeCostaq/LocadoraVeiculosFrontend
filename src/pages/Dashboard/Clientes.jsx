@@ -12,6 +12,7 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
+import { formatDate } from "../../utils/format";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -65,13 +66,11 @@ const Clientes = () => {
   const handleOpenModal = (cliente = null) => {
     if (cliente) {
       setCurrentCliente(cliente);
-      // Format date for input type="date"
-      const formattedDate = cliente.dataNasc
-        ? cliente.dataNasc.split("T")[0]
-        : "";
+      // Format date for text input dd/mm/yyyy
+      const formattedDate = formatDate(cliente.dataNasc);
       setFormData({
         ...cliente,
-        dataNasc: formattedDate,
+        dataNasc: formattedDate === '---' ? '' : formattedDate,
         telefone: formatTelefone(cliente.telefone || ""),
       });
     } else {
@@ -106,6 +105,14 @@ const Clientes = () => {
       .replace(/(-\d{4})\d+?$/, "$1");
   };
 
+  const formatDataNascInput = (value) => {
+    return value
+      .replace(/\D/g, "")
+      .replace(/(\d{2})(\d)/, "$1/$2")
+      .replace(/(\d{2})(\d)/, "$1/$2")
+      .replace(/(\d{4})\d+?$/, "$1");
+  };
+
   const handleCPFChange = (e) => {
     const formatted = formatCPF(e.target.value);
     setFormData({ ...formData, cpf: formatted });
@@ -116,8 +123,17 @@ const Clientes = () => {
     setFormData({ ...formData, telefone: formatted });
   };
 
+  const handleDataNascChange = (e) => {
+    const formatted = formatDataNascInput(e.target.value);
+    setFormData({ ...formData, dataNasc: formatted });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Convert dd/mm/yyyy to yyyy-mm-dd for API
+    const [day, month, year] = formData.dataNasc.split('/');
+    const apiDate = `${year}-${month}-${day}`;
 
     // RequestAdicionarClienteDTO / RequestEditarClienteDTO
     const payload = {
@@ -125,7 +141,7 @@ const Clientes = () => {
       cpf: formData.cpf.replace(/\D/g, ""), // Enviar apenas números para o back
       email: formData.email,
       telefone: formData.telefone.replace(/\D/g, ""), // Enviar apenas números para o back
-      dataNasc: formData.dataNasc, // format: date (yyyy-mm-dd)
+      dataNasc: apiDate, // format: date (yyyy-mm-dd)
       endereco: formData.endereco,
       ativo: formData.ativo,
     };
@@ -184,6 +200,7 @@ const Clientes = () => {
                 <tr>
                   <th className="px-6 py-4 font-bold text-sm">Cliente</th>
                   <th className="px-6 py-4 font-bold text-sm">CPF</th>
+                  <th className="px-6 py-4 font-bold text-sm">Data Nasc.</th>
                   <th className="px-6 py-4 font-bold text-sm">Contato</th>
                   <th className="px-6 py-4 font-bold text-sm">Status</th>
                   <th className="px-6 py-4 font-bold text-sm text-right">
@@ -213,6 +230,9 @@ const Clientes = () => {
                     </td>
                     <td className="px-6 py-4 text-sm font-mono">
                       {cliente.cpf}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {formatDate(cliente.dataNasc)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">
@@ -312,13 +332,12 @@ const Clientes = () => {
                   Data de Nascimento
                 </label>
                 <input
-                  type="date"
+                  type="text"
                   required
+                  placeholder="dd/mm/yyyy"
                   className="w-full bg-input border border-border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-primary"
                   value={formData.dataNasc}
-                  onChange={(e) =>
-                    setFormData({ ...formData, dataNasc: e.target.value })
-                  }
+                  onChange={handleDataNascChange}
                 />
               </div>
               <div className="space-y-1">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/client';
 import { Plus, Edit, Layers, Loader2, X, DollarSign } from 'lucide-react';
+import { formatCurrency } from '../../utils/format';
 
 const Categorias = () => {
   const [categorias, setCategorias] = useState([]);
@@ -70,13 +71,6 @@ const Categorias = () => {
     }
   };
 
-  const formatPriceTruncated = (value) => {
-    if (value === null || value === undefined) return '0,00';
-    // Truncate to 2 decimal places without rounding
-    const truncated = Math.floor(value * 100) / 100;
-    return truncated.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -117,7 +111,7 @@ const Categorias = () => {
                     <td className="px-6 py-4 font-bold text-sm">{cat.nome}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate">{cat.descricao}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="font-bold text-primary">R$ {formatPriceTruncated(cat.valorDiaria)}</span>
+                      <span className="font-bold text-primary">{formatCurrency(cat.valorDiaria)}</span>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${

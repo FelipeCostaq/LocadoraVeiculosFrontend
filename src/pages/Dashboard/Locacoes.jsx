@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/client';
 import { Plus, CheckCircle, CalendarDays, Loader2, X, User, Car as CarIcon, ArrowRight } from 'lucide-react';
+import { formatCurrency, formatDateTime } from '../../utils/format';
 
 const Locacoes = () => {
   const [locacoes, setLocacoes] = useState([]);
@@ -144,20 +145,20 @@ const Locacoes = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-xs text-muted-foreground">
-                      {new Date(loc.dataRetirada).toLocaleString()}
+                      {formatDateTime(loc.dataRetirada)}
                     </td>
                     <td className="px-6 py-4 text-xs text-muted-foreground">
-                      {new Date(loc.dataPrevDevol).toLocaleString()}
+                      {formatDateTime(loc.dataPrevDevol)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
                         {loc.status === 1 && (
                           <>
                             <span className="text-xs font-bold text-green-600">
-                              {new Date(loc.dataDevolução).toLocaleString()}
+                              {formatDateTime(loc.dataDevolução)}
                             </span>
                             <span className="text-[10px] font-bold bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full w-fit">
-                              R$ {loc.valorTotal?.toFixed(2)}
+                              {formatCurrency(loc.valorTotal)}
                             </span>
                           </>
                         )}
