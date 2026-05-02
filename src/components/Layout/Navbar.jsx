@@ -20,8 +20,6 @@ const Navbar = () => {
       </Link>
 
       <div className="flex items-center gap-6">
-        <Link to="/" className="text-foreground hover:text-primary transition-colors">Veículos</Link>
-        
         {user ? (
           <>
             <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
