@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5235",
+  baseURL:
+    "https://api-locadora-veiculos.ashydesert-a871377f.brazilsouth.azurecontainerapps.io",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
