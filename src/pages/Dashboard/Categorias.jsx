@@ -110,7 +110,7 @@ const Categorias = () => {
                     <td className="px-6 py-4 font-bold text-sm">{cat.nome}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate">{cat.descricao}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="font-bold text-primary">R$ {cat.valorDiaria?.toFixed(2)}</span>
+                      <span className="font-bold text-primary">R$ {cat.valorDiaria}</span>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${
@@ -167,10 +167,11 @@ const Categorias = () => {
                 <div className="relative">
                   <DollarSign size={16} className="absolute left-3 top-3 text-muted-foreground" />
                   <input 
-                    type="number" step="0.01" required
+                    type="text" required
+                    placeholder="0.00"
                     className="w-full bg-input border border-border rounded-lg p-2.5 pl-10 outline-none focus:ring-2 focus:ring-primary"
                     value={formData.valorDiaria}
-                    onChange={(e) => setFormData({...formData, valorDiaria: parseFloat(e.target.value)})}
+                    onChange={(e) => setFormData({...formData, valorDiaria: e.target.value})}
                   />
                 </div>
               </div>
