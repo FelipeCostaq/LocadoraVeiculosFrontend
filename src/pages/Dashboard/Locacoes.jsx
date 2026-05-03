@@ -37,7 +37,32 @@ const Locacoes = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const [resLoc, resCli, resVeiTodos, resVeiDisp] = await Promise.all([
+          api.get('/veiculoalocado'),
+          api.get('/clientes'),
+          api.get('/veiculos'),
+          api.get('/veiculos/disponivel')
+        ]);
+        if (isMounted) {
+          setLocacoes(resLoc.data);
+          setClientes(resCli.data);
+          setVeiculos(resVeiTodos.data);
+          setVeiculosDisponiveis(resVeiDisp.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados de locação:', error);
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleDarBaixa = async (id) => {

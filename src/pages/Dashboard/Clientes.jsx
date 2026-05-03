@@ -71,7 +71,24 @@ const Clientes = () => {
   };
 
   useEffect(() => {
-    fetchClientes();
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const response = await api.get("/clientes");
+        if (isMounted) {
+          setClientes(response.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar clientes:", error);
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleOpenModal = (cliente = null) => {
@@ -297,7 +314,9 @@ const Clientes = () => {
                       colSpan="6"
                       className="px-6 py-20 text-center text-muted-foreground"
                     >
-                      Nenhum cliente encontrado para "{searchTerm}".
+                      {searchTerm 
+                        ? `Nenhum cliente encontrado para "${searchTerm}".`
+                        : "Nenhum cliente cadastrado até o momento."}
                     </td>
                   </tr>
                 )}

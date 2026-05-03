@@ -23,7 +23,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    checkAuth();
+    let isMounted = true;
+    const verifyAuth = async () => {
+      try {
+        const response = await api.get("/auth/manage/info");
+        if (isMounted) {
+          setUser(response.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setUser(null);
+          setLoading(false);
+        }
+      }
+    };
+
+    verifyAuth();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = async (email, password) => {

@@ -23,46 +23,42 @@ const DashboardHome = () => {
   const [ultimasLocacoes, setUltimasLocacoes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    try {
-      const resVei = await api.get("/veiculos").catch((e) => {
-        console.error("Erro veículos", e);
-        return { data: [] };
-      });
-      const resCli = await api.get("/clientes").catch((e) => {
-        console.error("Erro clientes", e);
-        return { data: [] };
-      });
-      const resLoc = await api.get("/veiculoalocado").catch((e) => {
-        console.error("Erro locações", e);
-        return { data: [] };
-      });
-      const resCat = await api.get("/categoria").catch((e) => {
-        console.error("Erro categorias", e);
-        return { data: [] };
-      });
-
-      setStats({
-        veiculos: resVei.data?.length || 0,
-        clientes: (resCli.data || []).filter((c) => c.ativo).length,
-        locacoes: (resLoc.data || []).filter((l) => l.status === 0).length,
-        categorias: resCat.data?.length || 0,
-      });
-
-      setUltimasLocacoes((resLoc.data || []).slice(-5).reverse());
-    } catch (error) {
-      console.error("Erro grave ao buscar dados do dashboard:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    let isMounted = true;
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        const [resVei, resCli, resLoc, resCat] = await Promise.all([
+          api.get("/veiculos").catch((e) => ({ data: [] })),
+          api.get("/clientes").catch((e) => ({ data: [] })),
+          api.get("/veiculoalocado").catch((e) => ({ data: [] })),
+          api.get("/categoria").catch((e) => ({ data: [] })),
+        ]);
+
+        if (isMounted) {
+          setStats({
+            veiculos: resVei.data?.length || 0,
+            clientes: (resCli.data || []).filter((c) => c.ativo).length,
+            locacoes: (resLoc.data || []).filter((l) => l.status === 0).length,
+            categorias: resCat.data?.length || 0,
+          });
+
+          setUltimasLocacoes((resLoc.data || []).slice(-5).reverse());
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Erro grave ao buscar dados do dashboard:", error);
+        if (isMounted) setLoading(false);
+      }
+    };
+
     if (user) {
       fetchDashboardData();
     }
-  }, []);
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const statCards = [
     {

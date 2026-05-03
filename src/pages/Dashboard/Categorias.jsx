@@ -27,7 +27,24 @@ const Categorias = () => {
   };
 
   useEffect(() => {
-    fetchCategorias();
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const response = await api.get('/categoria');
+        if (isMounted) {
+          setCategorias(response.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar categorias:', error);
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleOpenModal = (categoria = null) => {

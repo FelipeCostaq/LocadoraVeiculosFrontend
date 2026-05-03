@@ -44,7 +44,28 @@ const Veiculos = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        const [resVei, resCat] = await Promise.all([
+          api.get("/veiculos"),
+          api.get("/categoria"),
+        ]);
+        if (isMounted) {
+          setVeiculos(resVei.data);
+          setCategorias(resCat.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const formatPlaca = (value) => {

@@ -19,6 +19,7 @@ const Home = () => {
   const catalogRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
         const [veiculosRes, categoriasRes] = await Promise.all([
@@ -26,16 +27,21 @@ const Home = () => {
           api.get("/categoria"),
         ]);
 
-        // Filter only active vehicles
-        setVeiculos(veiculosRes.data.filter((v) => v.ativo));
-        setCategorias(categoriasRes.data);
+        if (isMounted) {
+          // Filter only active vehicles
+          setVeiculos(veiculosRes.data.filter((v) => v.ativo));
+          setCategorias(categoriasRes.data);
+          setLoading(false);
+        }
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
-      } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const scrollToCatalog = () => {
