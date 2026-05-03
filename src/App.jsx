@@ -37,6 +37,25 @@ const ProtectedRoute = () => {
   );
 };
 
+// Public Only Route Wrapper (Redirects to dashboard if already logged in)
+const PublicRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Outlet />;
+};
+
 const App = () => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -45,7 +64,10 @@ const App = () => {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
 
           {/* Protected Dashboard Routes */}
           <Route path="/dashboard" element={<ProtectedRoute />}>
