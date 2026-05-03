@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import api from "../../api/client";
 import {
   Plus,
@@ -10,13 +10,14 @@ import {
   Phone,
   Mail,
   MapPin,
-  Calendar,
+  Search,
 } from "lucide-react";
 import { formatDate } from "../../utils/format";
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCliente, setCurrentCliente] = useState(null);
   const [formData, setFormData] = useState({
@@ -39,6 +40,16 @@ const Clientes = () => {
       setLoading(false);
     }
   };
+
+  const filteredClientes = useMemo(() => {
+    return clientes.filter((cliente) => {
+      const search = searchTerm.toLowerCase();
+      return (
+        cliente.nome.toLowerCase().includes(search) ||
+        cliente.id.toLowerCase().includes(search)
+      );
+    });
+  }, [clientes, searchTerm]);
 
   const handleDelete = async (id) => {
     if (
@@ -169,16 +180,23 @@ const Clientes = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold">Clientes</h2>
-          <p className="text-muted-foreground">
-            Gerencie o cadastro de seus clientes.
-          </p>
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div className="relative w-full md:max-w-md">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder="Buscar por ID ou Nome..."
+            className="w-full bg-card border border-border rounded-lg py-2 pl-10 pr-4 outline-none focus:ring-2 focus:ring-primary transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-primary/90 transition-all"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-primary/90 transition-all w-full md:w-auto justify-center"
         >
           <Plus size={20} />
           Novo Cliente
@@ -200,82 +218,89 @@ const Clientes = () => {
                 <tr>
                   <th className="px-6 py-4 font-bold text-sm">Cliente</th>
                   <th className="px-6 py-4 font-bold text-sm">CPF</th>
-                  <th className="px-6 py-4 font-bold text-sm">Data Nasc.</th>
-                  <th className="px-6 py-4 font-bold text-sm">Contato</th>
-                  <th className="px-6 py-4 font-bold text-sm">Status</th>
                   <th className="px-6 py-4 font-bold text-sm text-right">
                     Ações
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {clientes.map((cliente) => (
-                  <tr
-                    key={cliente.id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                          <Users size={20} />
+                {filteredClientes.length > 0 ? (
+                  filteredClientes.map((cliente) => (
+                    <tr
+                      key={cliente.id}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <Users size={20} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm">{cliente.nome}</p>
+                            <p className="text-[10px] text-muted-foreground font-mono">
+                              ID: {cliente.id}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-sm">{cliente.nome}</p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <MapPin size={12} />{" "}
-                            {cliente.endereco || "Endereço não informado"}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-mono">
+                        {cliente.cpf}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        {formatDate(cliente.dataNasc)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="space-y-1">
+                          <p className="text-xs flex items-center gap-1 text-muted-foreground">
+                            <Mail size={12} /> {cliente.email}
+                          </p>
+                          <p className="text-xs flex items-center gap-1 text-muted-foreground">
+                            <Phone size={12} />{" "}
+                            {formatTelefone(cliente.telefone || "")}
                           </p>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-mono">
-                      {cliente.cpf}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {formatDate(cliente.dataNasc)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        <p className="text-xs flex items-center gap-1 text-muted-foreground">
-                          <Mail size={12} /> {cliente.email}
-                        </p>
-                        <p className="text-xs flex items-center gap-1 text-muted-foreground">
-                          <Phone size={12} />{" "}
-                          {formatTelefone(cliente.telefone || "")}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-[10px] font-bold ${
-                          cliente.ativo
-                            ? "bg-green-500/10 text-green-500"
-                            : "bg-destructive/10 text-destructive"
-                        }`}
-                      >
-                        {cliente.ativo ? "ATIVO" : "INATIVO"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleOpenModal(cliente)}
-                          className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary"
-                          title="Editar Cliente"
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-[10px] font-bold ${
+                            cliente.ativo
+                              ? "bg-green-500/10 text-green-500"
+                              : "bg-destructive/10 text-destructive"
+                          }`}
                         >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(cliente.id)}
-                          className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive"
-                          title="Excluir Cliente"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                          {cliente.ativo ? "ATIVO" : "INATIVO"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleOpenModal(cliente)}
+                            className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary"
+                            title="Editar Cliente"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(cliente.id)}
+                            className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive"
+                            title="Excluir Cliente"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="px-6 py-20 text-center text-muted-foreground"
+                    >
+                      Nenhum cliente encontrado para "{searchTerm}".
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
